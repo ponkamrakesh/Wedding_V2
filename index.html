@@ -668,4 +668,225 @@
   <div class="ornament-line" style="width:300px; margin:16px 0;"><span>✦</span></div>
 
   <div class="muhurtham-box">
-    <div class="muhurtham-label">Au
+    <div class="muhurtham-label">Auspicious Muhurtham</div>
+    <div class="muhurtham-time">7:35 – 9:35 AM</div>
+    <div class="muhurtham-label" style="margin-top:8px;">Pushkarakalam</div>
+    <div class="muhurtham-time" style="font-size:20px;">8:25 – 8:29 AM</div>
+    <div class="nakshatra">
+      Sravana Nakshatram · Midhuna Lagna Pushkaramsam<br>
+      <span style="font-family:'Noto Serif Telugu', serif; font-size:15px; color:var(--gold);">శుభముస్తు !! కళ్యాణముస్తు !!!</span>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:10px;">Days Until The Wedding</div>
+  <div class="countdown" id="countdown">
+    <div class="countdown-item">
+      <span class="countdown-num" id="days">--</span>
+      <div class="countdown-label">Days</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="hours">--</span>
+      <div class="countdown-label">Hours</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="minutes">--</span>
+      <div class="countdown-label">Minutes</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="seconds">--</span>
+      <div class="countdown-label">Seconds</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 5: CLOSING ===== -->
+<section id="closing">
+  <div class="closing-telugu">బత్తల వారి పెండ్లి పిలుపు</div>
+  <div class="ornament-line" style="width:300px;"><span>❧</span></div>
+
+  <div class="closing-message">
+    With hearts full of joy, the Batthala family warmly invites you to bless <em>Naveen &amp; Kavya</em> as they begin their beautiful journey together.
+  </div>
+
+  <div class="closing-family">
+    ✦ Batthala Tirupataiah &amp; Smt. Lakshmi Samrajyam ✦
+  </div>
+
+  <div class="contact-box">
+    📞 8885279718 &nbsp;|&nbsp; 7672069943<br>
+    <span style="font-size:12px; letter-spacing:1px;">Bodagudipadu Village · Dagadarthi Mandal · Nellore District</span>
+  </div>
+
+  <div style="margin-top:24px; text-align:center; opacity:0.3; font-size:12px; letter-spacing:3px; font-family:'Cinzel',serif; transition: opacity 0.8s 1s;" class="closing-family">
+    SRIRASTHU · SUBHAMASTHU · KALYANAMASTHU
+  </div>
+</section>
+
+<!-- Hidden audio element for MP3 playback -->
+<audio id="weddingAudio" loop preload="auto" style="display:none;">
+  <!-- 
+    IMPORTANT: Place your MP3 file (e.g., wedding-music.mp3) in the root of your GitHub repo.
+    The src below will work once deployed to Vercel (or locally if file exists).
+    If you rename the file, update the src accordingly.
+  -->
+  <source src="./wedding-music.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+  // ===== PARTICLES =====
+  const particleContainer = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 3) + 'px';
+    particleContainer.appendChild(p);
+  }
+
+  // ===== SCROLL REVEAL =====
+  const revealElements = document.querySelectorAll(
+    '.section-label, .families-grid, .events-title, .event-card, .venue-name, .venue-detail, .muhurtham-box, .countdown, .closing-telugu, .closing-message, .closing-family, .contact-box'
+  );
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+
+  revealElements.forEach(el => observer.observe(el));
+
+  // ===== NAV DOTS =====
+  const sections = document.querySelectorAll('section');
+  const dots = document.querySelectorAll('.dot');
+
+  function scrollToSection(i) {
+    sections[i].scrollIntoView({ behavior: 'smooth' });
+  }
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = Array.from(sections).indexOf(e.target);
+        dots.forEach(d => d.classList.remove('active'));
+        dots[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  sections.forEach(s => sectionObserver.observe(s));
+
+  // ===== COUNTDOWN =====
+  function updateCountdown() {
+    const wedding = new Date('2026-05-09T07:35:00');
+    const now = new Date();
+    const diff = wedding - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent = '0';
+      document.getElementById('hours').textContent = '0';
+      document.getElementById('minutes').textContent = '0';
+      document.getElementById('seconds').textContent = '0';
+      return;
+    }
+
+    document.getElementById('days').textContent = Math.floor(diff / 86400000);
+    document.getElementById('hours').textContent = Math.floor((diff % 86400000) / 3600000);
+    document.getElementById('minutes').textContent = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('seconds').textContent = Math.floor((diff % 60000) / 1000);
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ===== MUSIC PLAYER (MP3 from GitHub repo) =====
+  const audio = document.getElementById('weddingAudio');
+  const musicControl = document.getElementById('musicControl');
+  const musicStatus = document.getElementById('musicStatus');
+
+  function toggleMusic() {
+    if (!audio) return;
+    
+    if (audio.paused) {
+      audio.play().then(() => {
+        updateMusicUI(true);
+      }).catch(err => {
+        console.log('Audio play failed (user interaction needed):', err);
+        // Still reflect attempt to play visually
+        updateMusicUI(false);
+      });
+    } else {
+      audio.pause();
+      updateMusicUI(false);
+    }
+  }
+
+  function updateMusicUI(playing) {
+    if (playing) {
+      musicControl.classList.add('playing');
+      musicStatus.textContent = 'Playing';
+    } else {
+      musicControl.classList.remove('playing');
+      musicStatus.textContent = 'Paused';
+    }
+  }
+
+  // Attempt autoplay on first user interaction (click/touch) if allowed
+  function attemptAutoplay() {
+    if (audio && audio.paused) {
+      audio.play().then(() => {
+        updateMusicUI(true);
+      }).catch(() => {
+        updateMusicUI(false);
+      });
+    }
+    // Remove listeners after first interaction
+    document.removeEventListener('click', attemptAutoplay);
+    document.removeEventListener('touchstart', attemptAutoplay);
+  }
+
+  // Many browsers block autoplay; we set up interaction listeners.
+  document.addEventListener('click', attemptAutoplay, { once: false });
+  document.addEventListener('touchstart', attemptAutoplay, { once: false });
+
+  // Also try to play immediately (may work in some environments)
+  window.addEventListener('load', () => {
+    if (audio) {
+      audio.play().then(() => {
+        updateMusicUI(true);
+        // If autoplay succeeded, remove interaction listeners
+        document.removeEventListener('click', attemptAutoplay);
+        document.removeEventListener('touchstart', attemptAutoplay);
+      }).catch(() => {
+        // Autoplay blocked; wait for interaction
+        updateMusicUI(false);
+        console.log('Autoplay blocked. Music will start on first tap/click.');
+      });
+    }
+  });
+
+  // Update UI if audio ends or is paused externally
+  audio.addEventListener('pause', () => updateMusicUI(false));
+  audio.addEventListener('play', () => updateMusicUI(true));
+  audio.addEventListener('ended', () => {
+    // If loop attribute is set it shouldn't end, but just in case
+    updateMusicUI(false);
+  });
+
+  // Ensure clicking the music control doesn't propagate to document autoplay handler
+  musicControl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMusic();
+  });
+
+  // Prevent the document-level autoplay from firing when interacting with music button
+  // (handled via stopPropagation above)
+</script>
+</body>
+</html>
