@@ -55,7 +55,7 @@
     }
     .ornament-line span { color: var(--gold); font-size: 18px; }
 
-    /* ----- Music Control (MP3 from repo) ----- */
+    /* Music Control */
     .music-toggle {
       position: fixed;
       bottom: 25px;
@@ -103,7 +103,7 @@
       font-size: 11px;
     }
 
-    /* opening & other styles unchanged */
+    /* opening styles */
     #opening {
       background: radial-gradient(ellipse at center, #1a0f05 0%, #0d0905 70%);
       text-align: center;
@@ -529,10 +529,10 @@
   <div class="dot" onclick="scrollToSection(4)"></div>
 </nav>
 
-<!-- MUSIC CONTROLLER (MP3 from GitHub repo) -->
-<div id="musicControl" class="music-toggle playing" onclick="toggleMusic()">
+<!-- MUSIC CONTROLLER -->
+<div id="musicControl" class="music-toggle" onclick="toggleMusic()">
   <span class="music-icon">🎵</span>
-  <span id="musicStatus">Playing</span>
+  <span id="musicStatus">Play Music</span>
 </div>
 
 <!-- PARTICLES -->
@@ -725,15 +725,14 @@
   </div>
 </section>
 
-<!-- Hidden audio element for MP3 playback -->
+<!-- Audio Element - REPLACE THE SRC WITH YOUR MP3 FILE PATH -->
 <audio id="weddingAudio" loop preload="auto" style="display:none;">
   <!-- 
-    IMPORTANT: Place your MP3 file (e.g., wedding-music.mp3) in the root of your GitHub repo.
-    The src below will work once deployed to Vercel (or locally if file exists).
-    If you rename the file, update the src accordingly.
+    ⚠️ IMPORTANT: Change the src below to your MP3 file name!
+    Example: src="./your-song-name.mp3"
+    The MP3 file must be in the same folder as this HTML file in your GitHub repo.
   -->
-  <source src="./Thaman_S_Radhe_Shyam_Climax_Bgm_Instrumental_Ringtone_(by Fringster.com).mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
+  <source src="./wedding-music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -805,88 +804,76 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  // ===== MUSIC PLAYER (MP3 from GitHub repo) =====
+  // ===== MUSIC PLAYER =====
   const audio = document.getElementById('weddingAudio');
   const musicControl = document.getElementById('musicControl');
   const musicStatus = document.getElementById('musicStatus');
+  let musicPlaying = false;
 
   function toggleMusic() {
     if (!audio) return;
     
     if (audio.paused) {
       audio.play().then(() => {
-        updateMusicUI(true);
-      }).catch(err => {
-        console.log('Audio play failed (user interaction needed):', err);
-        // Still reflect attempt to play visually
-        updateMusicUI(false);
+        setMusicState(true);
+      }).catch((err) => {
+        console.log('Play failed:', err);
+        setMusicState(false);
       });
     } else {
       audio.pause();
-      updateMusicUI(false);
+      setMusicState(false);
     }
   }
 
-  function updateMusicUI(playing) {
+  function setMusicState(playing) {
+    musicPlaying = playing;
     if (playing) {
       musicControl.classList.add('playing');
       musicStatus.textContent = 'Playing';
     } else {
       musicControl.classList.remove('playing');
-      musicStatus.textContent = 'Paused';
+      musicStatus.textContent = 'Play Music';
     }
   }
 
-  // Attempt autoplay on first user interaction (click/touch) if allowed
-  function attemptAutoplay() {
-    if (audio && audio.paused) {
-      audio.play().then(() => {
-        updateMusicUI(true);
-      }).catch(() => {
-        updateMusicUI(false);
-      });
-    }
-    // Remove listeners after first interaction
-    document.removeEventListener('click', attemptAutoplay);
-    document.removeEventListener('touchstart', attemptAutoplay);
-  }
-
-  // Many browsers block autoplay; we set up interaction listeners.
-  document.addEventListener('click', attemptAutoplay, { once: false });
-  document.addEventListener('touchstart', attemptAutoplay, { once: false });
-
-  // Also try to play immediately (may work in some environments)
-  window.addEventListener('load', () => {
-    if (audio) {
-      audio.play().then(() => {
-        updateMusicUI(true);
-        // If autoplay succeeded, remove interaction listeners
-        document.removeEventListener('click', attemptAutoplay);
-        document.removeEventListener('touchstart', attemptAutoplay);
-      }).catch(() => {
-        // Autoplay blocked; wait for interaction
-        updateMusicUI(false);
-        console.log('Autoplay blocked. Music will start on first tap/click.');
-      });
-    }
+  // Handle audio events
+  audio.addEventListener('play', () => setMusicState(true));
+  audio.addEventListener('pause', () => setMusicState(false));
+  audio.addEventListener('ended', () => setMusicState(false));
+  
+  audio.addEventListener('error', (e) => {
+    console.error('Audio error:', e);
+    setMusicState(false);
+    musicStatus.textContent = 'No Music File';
   });
 
-  // Update UI if audio ends or is paused externally
-  audio.addEventListener('pause', () => updateMusicUI(false));
-  audio.addEventListener('play', () => updateMusicUI(true));
-  audio.addEventListener('ended', () => {
-    // If loop attribute is set it shouldn't end, but just in case
-    updateMusicUI(false);
-  });
-
-  // Ensure clicking the music control doesn't propagate to document autoplay handler
+  // Stop propagation on music button
   musicControl.addEventListener('click', (e) => {
     e.stopPropagation();
-    toggleMusic();
   });
 
-  // Prevent the document-level autoplay from firing when interacting with music button
-  // (handled via stopPropagation above)
+  // Try to autoplay on first user interaction
+  let autoplayAttempted = false;
+  
+  function tryAutoplay() {
+    if (autoplayAttempted || !audio || !audio.paused) return;
+    autoplayAttempted = true;
+    
+    audio.play().then(() => {
+      setMusicState(true);
+    }).catch(() => {
+      setMusicState(false);
+      console.log('Autoplay blocked. Click the music button to play.');
+    });
+    
+    // Remove listeners
+    document.removeEventListener('click', tryAutoplay);
+    document.removeEventListener('touchstart', tryAutoplay);
+  }
+
+  document.addEventListener('click', tryAutoplay);
+  document.addEventListener('touchstart', tryAutoplay);
 </script>
 </body>
 </html>
