@@ -736,82 +736,73 @@
 </audio>
 
 <script>
-  // ===== PARTICLES =====
-  const particleContainer = document.getElementById('particles');
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.animationDuration = (8 + Math.random() * 12) + 's';
-    p.style.animationDelay = (Math.random() * 10) + 's';
-    p.style.width = p.style.height = (1 + Math.random() * 3) + 'px';
-    particleContainer.appendChild(p);
-  }
+/* ===== PARTICLES ===== */
+const particleContainer = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.animationDuration = (8 + Math.random() * 12) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.width = p.style.height = (1 + Math.random() * 3) + 'px';
+  particleContainer.appendChild(p);
+}
 
-  // ===== SCROLL REVEAL =====
-  const revealElements = document.querySelectorAll(
-    '.section-label, .families-grid, .events-title, .event-card, .venue-name, .venue-detail, .muhurtham-box, .countdown, .closing-telugu, .closing-message, .closing-family, .contact-box'
-  );
+/* ===== SCROLL REVEAL ===== */
+const revealElements = document.querySelectorAll(
+  '.section-label, .families-grid, .events-title, .event-card, .venue-name, .venue-detail, .muhurtham-box, .countdown, .closing-telugu, .closing-message, .closing-family, .contact-box'
+);
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add('visible');
-    });
-  }, { threshold: 0.15 });
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
 
-  revealElements.forEach(el => observer.observe(el));
+revealElements.forEach(el => observer.observe(el));
 
-  // ===== NAV DOTS =====
-  const sections = document.querySelectorAll('section');
-  const dots = document.querySelectorAll('.dot');
+/* ===== NAV DOTS ===== */
+const sections = document.querySelectorAll('section');
+const dots = document.querySelectorAll('.dot');
 
-  function scrollToSection(i) {
-    sections[i].scrollIntoView({ behavior: 'smooth' });
-  }
+function scrollToSection(i) {
+  smoothScrollTo(sections[i], 2000);
+}
 
-  const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        const idx = Array.from(sections).indexOf(e.target);
-        dots.forEach(d => d.classList.remove('active'));
-        dots[idx].classList.add('active');
-      }
-    });
-  }, { threshold: 0.5 });
-
-  sections.forEach(s => sectionObserver.observe(s));
-
-  // ===== COUNTDOWN =====
-  function updateCountdown() {
-    const wedding = new Date('2026-05-09T07:35:00');
-    const now = new Date();
-    const diff = wedding - now;
-
-    if (diff <= 0) {
-      document.getElementById('days').textContent = '0';
-      document.getElementById('hours').textContent = '0';
-      document.getElementById('minutes').textContent = '0';
-      document.getElementById('seconds').textContent = '0';
-      return;
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = Array.from(sections).indexOf(e.target);
+      dots.forEach(d => d.classList.remove('active'));
+      dots[idx].classList.add('active');
     }
+  });
+}, { threshold: 0.5 });
 
-    document.getElementById('days').textContent = Math.floor(diff / 86400000);
-    document.getElementById('hours').textContent = Math.floor((diff % 86400000) / 3600000);
-    document.getElementById('minutes').textContent = Math.floor((diff % 3600000) / 60000);
-    document.getElementById('seconds').textContent = Math.floor((diff % 60000) / 1000);
+sections.forEach(s => sectionObserver.observe(s));
+
+/* ===== COUNTDOWN ===== */
+function updateCountdown() {
+  const wedding = new Date('2026-05-09T07:35:00');
+  const now = new Date();
+  const diff = wedding - now;
+
+  if (diff <= 0) {
+    ['days','hours','minutes','seconds'].forEach(id => {
+      document.getElementById(id).textContent = '0';
+    });
+    return;
   }
 
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
+  document.getElementById('days').textContent = Math.floor(diff / 86400000);
+  document.getElementById('hours').textContent = Math.floor((diff % 86400000) / 3600000);
+  document.getElementById('minutes').textContent = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('seconds').textContent = Math.floor((diff % 60000) / 1000);
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
 
-  // ===== MUSIC PLAYER =====
-  const audio = document.getElementById('weddingAudio');
-  const musicControl = document.getElementById('musicControl');
-  const musicStatus = document.getElementById('musicStatus');
-  let musicPlaying = false;
-
-  function toggleMusic() {
-// ===== MUSIC PLAYER =====
+/* ===== MUSIC PLAYER ===== */
 const audio = document.getElementById('weddingAudio');
 const musicControl = document.getElementById('musicControl');
 const musicStatus = document.getElementById('musicStatus');
@@ -826,29 +817,21 @@ function setMusicState(playing) {
   }
 }
 
-// Toggle ONLY for stopping
+// Stop only
 musicControl.addEventListener('click', () => {
-  if (!audio) return;
-
   if (!audio.paused) {
     audio.pause();
     setMusicState(false);
   }
 });
 
-// Try autoplay on load
+// Autoplay attempt
 window.addEventListener('load', () => {
-  audio.muted = false; // must be false for sound
-
   audio.play().then(() => {
     setMusicState(true);
   }).catch(() => {
-    // Autoplay blocked → wait for first interaction
     const startOnInteraction = () => {
-      audio.play().then(() => {
-        setMusicState(true);
-      }).catch(() => {});
-      
+      audio.play().then(() => setMusicState(true));
       document.removeEventListener('click', startOnInteraction);
       document.removeEventListener('touchstart', startOnInteraction);
     };
@@ -858,67 +841,42 @@ window.addEventListener('load', () => {
   });
 });
 
-// Audio events
 audio.addEventListener('pause', () => setMusicState(false));
 audio.addEventListener('play', () => setMusicState(true));
-audio.addEventListener('error', () => {
-  musicStatus.textContent = 'No Music';
-});
-  }
 
-  function setMusicState(playing) {
-    musicPlaying = playing;
-    if (playing) {
-      musicControl.classList.add('playing');
-      musicStatus.textContent = 'Playing';
-    } else {
-      musicControl.classList.remove('playing');
-      musicStatus.textContent = 'Play Music';
+/* ===== SMOOTH SCROLL ENGINE ===== */
+function smoothScrollTo(element, duration = 2500) {
+  const start = window.scrollY;
+  const end = element.offsetTop;
+  const distance = end - start;
+  let startTime = null;
+
+  function animation(currentTime) {
+    if (!startTime) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+
+    window.scrollTo(0, start + distance * easeInOut(progress));
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animation);
     }
   }
 
-  // Handle audio events
-  audio.addEventListener('play', () => setMusicState(true));
-  audio.addEventListener('pause', () => setMusicState(false));
-  audio.addEventListener('ended', () => setMusicState(false));
-  
-  audio.addEventListener('error', (e) => {
-    console.error('Audio error:', e);
-    setMusicState(false);
-    musicStatus.textContent = 'No Music File';
-  });
-
-  // Stop propagation on music button
-  musicControl.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
-  // Try to autoplay on first user interaction
-  let autoplayAttempted = false;
-  
-  function tryAutoplay() {
-    if (autoplayAttempted || !audio || !audio.paused) return;
-    autoplayAttempted = true;
-    
-    audio.play().then(() => {
-      setMusicState(true);
-    }).catch(() => {
-      setMusicState(false);
-      console.log('Autoplay blocked. Click the music button to play.');
-    });
-    
-    // Remove listeners
-    document.removeEventListener('click', tryAutoplay);
-    document.removeEventListener('touchstart', tryAutoplay);
+  function easeInOut(t) {
+    return t < 0.5
+      ? 2 * t * t
+      : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
-  document.addEventListener('click', tryAutoplay);
-  document.addEventListener('touchstart', tryAutoplay);
-  let currentSection = 0;
+  requestAnimationFrame(animation);
+}
+
+/* ===== AUTO SLIDE ===== */
+let currentSection = 0;
 let autoScrollInterval = null;
 let resumeTimeout;
 
-// Start auto scroll
 function startAutoScroll() {
   stopAutoScroll();
 
@@ -926,46 +884,40 @@ function startAutoScroll() {
     currentSection++;
 
     if (currentSection >= sections.length) {
-      currentSection = 0; // loop back to first
+      currentSection = 0;
     }
 
-    sections[currentSection].scrollIntoView({
-      behavior: 'smooth'
-    });
-  }, 5000); // 5 seconds per section
+    smoothScrollTo(sections[currentSection], 2500);
+  }, 7000); // slower for readability
 }
 
-// Stop auto scroll
 function stopAutoScroll() {
   if (autoScrollInterval) {
     clearInterval(autoScrollInterval);
   }
 }
 
-// Reset timer when user interacts
 function resetAutoScrollTimer() {
   stopAutoScroll();
   clearTimeout(resumeTimeout);
 
   resumeTimeout = setTimeout(() => {
     startAutoScroll();
-  }, 8000); // resume after 8 seconds
+  }, 8000);
 }
 
-// Start after page load
+// Start after load
 window.addEventListener('load', () => {
   setTimeout(startAutoScroll, 2000);
 });
 
-// Stop / reset on user interaction
+// Stop on interaction
 ['wheel', 'touchstart', 'click'].forEach(event => {
   document.addEventListener(event, resetAutoScrollTimer);
 });
 
-// Optional: stop when music button clicked
-musicControl.addEventListener('click', () => {
-  stopAutoScroll();
-});
+// Stop when music clicked
+musicControl.addEventListener('click', stopAutoScroll);
 </script>
 </body>
 </html>
