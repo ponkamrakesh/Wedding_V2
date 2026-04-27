@@ -530,9 +530,9 @@
 </nav>
 
 <!-- MUSIC CONTROLLER -->
-<div id="musicControl" class="music-toggle" onclick="toggleMusic()">
+<div id="musicControl" class="music-toggle">
   <span class="music-icon">🎵</span>
-  <span id="musicStatus">Play Music</span>
+  <span id="musicStatus">Loading..</span>
 </div>
 
 <!-- PARTICLES -->
@@ -811,19 +811,59 @@
   let musicPlaying = false;
 
   function toggleMusic() {
-    if (!audio) return;
-    
-    if (audio.paused) {
+// ===== MUSIC PLAYER =====
+const audio = document.getElementById('weddingAudio');
+const musicControl = document.getElementById('musicControl');
+const musicStatus = document.getElementById('musicStatus');
+
+function setMusicState(playing) {
+  if (playing) {
+    musicControl.classList.add('playing');
+    musicStatus.textContent = 'Playing';
+  } else {
+    musicControl.classList.remove('playing');
+    musicStatus.textContent = 'Tap to Stop';
+  }
+}
+
+// Toggle ONLY for stopping
+musicControl.addEventListener('click', () => {
+  if (!audio) return;
+
+  if (!audio.paused) {
+    audio.pause();
+    setMusicState(false);
+  }
+});
+
+// Try autoplay on load
+window.addEventListener('load', () => {
+  audio.muted = false; // must be false for sound
+
+  audio.play().then(() => {
+    setMusicState(true);
+  }).catch(() => {
+    // Autoplay blocked → wait for first interaction
+    const startOnInteraction = () => {
       audio.play().then(() => {
         setMusicState(true);
-      }).catch((err) => {
-        console.log('Play failed:', err);
-        setMusicState(false);
-      });
-    } else {
-      audio.pause();
-      setMusicState(false);
-    }
+      }).catch(() => {});
+      
+      document.removeEventListener('click', startOnInteraction);
+      document.removeEventListener('touchstart', startOnInteraction);
+    };
+
+    document.addEventListener('click', startOnInteraction);
+    document.addEventListener('touchstart', startOnInteraction);
+  });
+});
+
+// Audio events
+audio.addEventListener('pause', () => setMusicState(false));
+audio.addEventListener('play', () => setMusicState(true));
+audio.addEventListener('error', () => {
+  musicStatus.textContent = 'No Music';
+});
   }
 
   function setMusicState(playing) {
