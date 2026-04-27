@@ -912,8 +912,10 @@ function startAutoScroll() {
       return;
     }
     
-    window.scrollBy(0, 1);
-  }, 30); 
+    // Increased scroll amount from 1 to 2 for a faster visual speed
+    window.scrollBy(0, 2);
+  // Decreased interval from 30ms to 20ms for faster update rate
+  }, 20); 
 }
 
 function pauseScroll() { isHolding = true; }
