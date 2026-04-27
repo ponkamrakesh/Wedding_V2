@@ -735,6 +735,8 @@
   <source src="/Thaman_S_Radhe_Shyam_Climax_Bgm_Instrumental_Ringtone_(by Fringster.com).mp3" type="audio/mpeg">
 </audio>
 
+<!-- ONLY SHOWING SCRIPT PART (rest of your HTML stays SAME) -->
+
 <script>
 /* ===== PARTICLES ===== */
 const particleContainer = document.getElementById('particles');
@@ -766,7 +768,10 @@ const sections = document.querySelectorAll('section');
 const dots = document.querySelectorAll('.dot');
 
 function scrollToSection(i) {
-  smoothScrollTo(sections[i], 2000);
+  window.scrollTo({
+    top: sections[i].offsetTop,
+    behavior: 'smooth'
+  });
 }
 
 const sectionObserver = new IntersectionObserver((entries) => {
@@ -830,94 +835,44 @@ window.addEventListener('load', () => {
   audio.play().then(() => {
     setMusicState(true);
   }).catch(() => {
-    const startOnInteraction = () => {
+    const startAudio = () => {
       audio.play().then(() => setMusicState(true));
-      document.removeEventListener('click', startOnInteraction);
-      document.removeEventListener('touchstart', startOnInteraction);
+      document.removeEventListener('click', startAudio);
+      document.removeEventListener('touchstart', startAudio);
     };
 
-    document.addEventListener('click', startOnInteraction);
-    document.addEventListener('touchstart', startOnInteraction);
+    document.addEventListener('click', startAudio);
+    document.addEventListener('touchstart', startAudio);
   });
 });
 
-audio.addEventListener('pause', () => setMusicState(false));
 audio.addEventListener('play', () => setMusicState(true));
+audio.addEventListener('pause', () => setMusicState(false));
 
-/* ===== SMOOTH SCROLL ENGINE ===== */
-function smoothScrollTo(element, duration = 2500) {
-  const start = window.scrollY;
-  const end = element.offsetTop;
-  const distance = end - start;
-  let startTime = null;
+/* ===== CONTINUOUS AUTO SCROLL ===== */
+let autoScrollActive = true;
+let scrollSpeed = 0.25; // 🔥 adjust here (0.2–0.4 best)
 
-  function animation(currentTime) {
-    if (!startTime) startTime = currentTime;
-    const timeElapsed = currentTime - startTime;
-    const progress = Math.min(timeElapsed / duration, 1);
+function continuousScroll() {
+  if (!autoScrollActive) return;
 
-    window.scrollTo(0, start + distance * easeInOut(progress));
-
-    if (timeElapsed < duration) {
-      requestAnimationFrame(animation);
-    }
-  }
-
-  function easeInOut(t) {
-    return t < 0.5
-      ? 2 * t * t
-      : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  }
-
-  requestAnimationFrame(animation);
+  window.scrollBy(0, scrollSpeed);
+  requestAnimationFrame(continuousScroll);
 }
 
-/* ===== AUTO SLIDE ===== */
-let currentSection = 0;
-let autoScrollInterval = null;
-let resumeTimeout;
-
-function startAutoScroll() {
-  stopAutoScroll();
-
-  autoScrollInterval = setInterval(() => {
-    currentSection++;
-
-    if (currentSection >= sections.length) {
-      currentSection = 0;
-    }
-
-    smoothScrollTo(sections[currentSection], 2500);
-  }, 7000); // slower for readability
-}
-
-function stopAutoScroll() {
-  if (autoScrollInterval) {
-    clearInterval(autoScrollInterval);
-  }
-}
-
-function resetAutoScrollTimer() {
-  stopAutoScroll();
-  clearTimeout(resumeTimeout);
-
-  resumeTimeout = setTimeout(() => {
-    startAutoScroll();
-  }, 8000);
-}
-
-// Start after load
+// Start scroll after load
 window.addEventListener('load', () => {
-  setTimeout(startAutoScroll, 2000);
+  setTimeout(() => {
+    continuousScroll();
+  }, 2000);
 });
 
-// Stop on interaction
-['wheel', 'touchstart', 'click'].forEach(event => {
-  document.addEventListener(event, resetAutoScrollTimer);
+// Stop if user interacts
+['wheel', 'touchstart', 'mousedown'].forEach(event => {
+  document.addEventListener(event, () => {
+    autoScrollActive = false;
+  });
 });
-
-// Stop when music clicked
-musicControl.addEventListener('click', stopAutoScroll);
 </script>
 </body>
 </html>
