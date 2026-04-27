@@ -25,6 +25,70 @@
       overflow-x: hidden;
     }
 
+    /* ===== WELCOME OVERLAY ===== */
+    #welcome-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, #1a0f05 0%, #0d0905 70%);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1.5s ease, visibility 1.5s;
+    }
+    #welcome-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(212,168,67,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139,26,26,0.08) 0%, transparent 50%);
+    }
+    .welcome-content {
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+    .welcome-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 8vw, 50px);
+      color: var(--gold);
+      font-style: italic;
+      margin-bottom: 30px;
+      font-weight: 300;
+    }
+    #open-invite-btn {
+      padding: 15px 35px;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(13, 9, 5, 0.7);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 40px;
+      cursor: pointer;
+      animation: pulseBtn 2s infinite;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+    }
+    #open-invite-btn:hover {
+      background: rgba(212,168,67,0.2);
+      color: var(--cream);
+    }
+    @keyframes pulseBtn {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212,168,67, 0.4); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(212,168,67, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212,168,67, 0); }
+    }
+    .fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
     section {
       min-height: 100vh;
       display: flex;
@@ -519,7 +583,13 @@
 </head>
 <body>
 
-<!-- NAV DOTS -->
+<div id="welcome-overlay">
+  <div class="welcome-content">
+    <h2 class="welcome-title">Welcome to Our Wedding</h2>
+    <button id="open-invite-btn">Tap to Open Invitation</button>
+  </div>
+</div>
+
 <nav class="nav-dots">
   <div class="dot active" onclick="scrollToSection(0)"></div>
   <div class="dot" onclick="scrollToSection(1)"></div>
@@ -528,16 +598,13 @@
   <div class="dot" onclick="scrollToSection(4)"></div>
 </nav>
 
-<!-- MUSIC CONTROLLER -->
 <div id="musicControl" class="music-toggle">
   <span class="music-icon">🎵</span>
-  <span id="musicStatus">Loading..</span>
+  <span id="musicStatus">Ready</span>
 </div>
 
-<!-- PARTICLES -->
 <div class="particles" id="particles"></div>
 
-<!-- ===== SECTION 1: OPENING ===== -->
 <section id="opening">
   <div class="mandala">
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -583,7 +650,6 @@
   </div>
 </section>
 
-<!-- ===== SECTION 2: FAMILIES ===== -->
 <section id="families">
   <div class="section-label">✦ Two Families · One Blessing ✦</div>
   <div class="ornament-line" style="width:300px;"><span>✦</span></div>
@@ -613,7 +679,6 @@
   </div>
 </section>
 
-<!-- ===== SECTION 3: EVENTS ===== -->
 <section id="events">
   <div class="events-title">Wedding Programme</div>
   <div class="ornament-line" style="width:300px;"><span>❧</span></div>
@@ -657,7 +722,6 @@
   </div>
 </section>
 
-<!-- ===== SECTION 4: VENUE ===== -->
 <section id="venue">
   <div class="section-label">✦ Venue & Muhurtham ✦</div>
 
@@ -701,7 +765,6 @@
   </div>
 </section>
 
-<!-- ===== SECTION 5: CLOSING ===== -->
 <section id="closing">
   <div class="closing-telugu">బత్తల వారి పెండ్లి పిలుపు</div>
   <div class="ornament-line" style="width:300px;"><span>❧</span></div>
@@ -724,13 +787,7 @@
   </div>
 </section>
 
-<!-- Audio Element - REPLACE THE SRC WITH YOUR MP3 FILE PATH -->
 <audio id="weddingAudio" loop preload="auto" style="display:none;">
-  <!-- 
-    ⚠️ IMPORTANT: Change the src below to your MP3 file name!
-    Example: src="./your-song-name.mp3"
-    The MP3 file must be in the same folder as this HTML file in your GitHub repo.
-  -->
   <source src="/Thaman_S_Radhe_Shyam_Climax_Bgm_Instrumental_Ringtone_(by Fringster.com).mp3" type="audio/mpeg">
 </audio>
 
@@ -765,7 +822,6 @@ const sections = document.querySelectorAll('section');
 const dots = document.querySelectorAll('.dot');
 
 function scrollToSection(i) {
-  // Modified: No longer kills auto-scroll
   window.scrollTo({
     top: sections[i].offsetTop,
     behavior: 'smooth'
@@ -805,10 +861,16 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ===== MUSIC PLAYER ===== */
+/* ===== WELCOME SCREEN, MUSIC PLAYER & AUTO SCROLL ===== */
 const audio = document.getElementById('weddingAudio');
 const musicControl = document.getElementById('musicControl');
 const musicStatus = document.getElementById('musicStatus');
+const welcomeOverlay = document.getElementById('welcome-overlay');
+const openBtn = document.getElementById('open-invite-btn');
+
+let autoScrolling = true;
+let isHolding = false;
+let scrollInterval;
 
 function setMusicState(playing) {
   if (playing) {
@@ -820,9 +882,8 @@ function setMusicState(playing) {
   }
 }
 
-// Toggle play/pause when clicked
+// Toggle play/pause from the floating button
 musicControl.addEventListener('click', (e) => {
-  // Stop the click from bubbling up and doing anything else
   e.stopPropagation(); 
   if (audio.paused) {
     audio.play().then(() => setMusicState(true));
@@ -832,93 +893,55 @@ musicControl.addEventListener('click', (e) => {
   }
 });
 
-// Autoplay on page load
-window.addEventListener('load', () => {
-  // Try to autoplay immediately
-  audio.play().then(() => {
-    setMusicState(true);
-  }).catch(() => {
-    // If browser blocks autoplay, wait for first user interaction anywhere
-    musicStatus.textContent = 'Tap Anywhere to Play';
-    
-    const startAudio = () => {
-      audio.play().then(() => setMusicState(true));
-      document.removeEventListener('click', startAudio);
-      document.removeEventListener('touchstart', startAudio);
-    };
-
-    document.addEventListener('click', startAudio, { once: true });
-    document.addEventListener('touchstart', startAudio, { once: true, passive: true });
-  });
-});
-
 audio.addEventListener('play', () => setMusicState(true));
 audio.addEventListener('pause', () => setMusicState(false));
 
-/* ===== CONTINUOUS AUTO SCROLL (HOLD TO PAUSE) ===== */
-let autoScrolling = true;
-let isHolding = false; // Tracks if user is touching/clicking
-let scrollInterval;
-
+// Continuous Auto Scroll logic
 function startAutoScroll() {
-  if (scrollInterval) {
-    clearInterval(scrollInterval);
-  }
-  
-  console.log('🎬 AUTO-SCROLL STARTED!');
+  if (scrollInterval) clearInterval(scrollInterval);
   
   scrollInterval = setInterval(() => {
-    // If the user is holding the screen, skip scrolling for this tick
-    if (!autoScrolling || isHolding) {
-      return; 
-    }
+    if (!autoScrolling || isHolding) return; 
     
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const currentScroll = window.pageYOffset || window.scrollY;
     
-    // Check if we reached the bottom
     if (currentScroll >= maxScroll - 10) {
       clearInterval(scrollInterval);
       autoScrolling = false;
-      console.log('🏁 Reached bottom!');
       return;
     }
     
-    // Scroll down by 1 pixel
     window.scrollBy(0, 1);
-    
   }, 30); 
 }
 
-// Pause scroll logic
-function pauseScroll() {
-  isHolding = true;
-}
+function pauseScroll() { isHolding = true; }
+function resumeScroll() { isHolding = false; }
 
-// Resume scroll logic
-function resumeScroll() {
-  isHolding = false;
-}
+// Handle the "Tap to Open" Button
+openBtn.addEventListener('click', () => {
+  // 1. Play the music
+  audio.play().then(() => {
+    setMusicState(true);
+  }).catch(err => console.log("Audio play failed:", err));
 
-// Start scrolling 3 seconds after page load
-window.addEventListener('load', () => {
-  console.log('✅ Page loaded! Auto-scroll will start in 3 seconds...');
-  setTimeout(() => {
-    if (autoScrolling) {
-      startAutoScroll();
-    }
-  }, 3000);
+  // 2. Fade out the welcome screen
+  welcomeOverlay.classList.add('fade-out');
+
+  // 3. Start the auto-scroll immediately after opening
+  if (autoScrolling) {
+    startAutoScroll();
+  }
 });
 
-// Mobile Touch Events (Pause on touch down, resume on lift)
+// Event Listeners for pausing scroll (Hold to Pause)
 window.addEventListener('touchstart', pauseScroll, { passive: true });
 window.addEventListener('touchend', resumeScroll, { passive: true });
 window.addEventListener('touchcancel', resumeScroll, { passive: true });
-
-// Desktop Mouse Events (Pause on click down, resume on lift)
 window.addEventListener('mousedown', pauseScroll);
 window.addEventListener('mouseup', resumeScroll);
-window.addEventListener('mouseleave', resumeScroll); // Resumes if mouse leaves the screen
+window.addEventListener('mouseleave', resumeScroll);
 </script>
 </body>
 </html>
