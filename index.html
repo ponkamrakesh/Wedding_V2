@@ -868,10 +868,6 @@ const musicStatus = document.getElementById('musicStatus');
 const welcomeOverlay = document.getElementById('welcome-overlay');
 const openBtn = document.getElementById('open-invite-btn');
 
-let autoScrolling = true;
-let isHolding = false;
-let scrollInterval;
-
 function setMusicState(playing) {
   if (playing) {
     musicControl.classList.add('playing');
@@ -896,26 +892,49 @@ musicControl.addEventListener('click', (e) => {
 audio.addEventListener('play', () => setMusicState(true));
 audio.addEventListener('pause', () => setMusicState(false));
 
-// Continuous Auto Scroll logic
+
+/* ===== CONTINUOUS AUTO SCROLL (50 SECONDS EXACT) ===== */
+let autoScrolling = true;
+let isHolding = false;
+let scrollInterval;
+let exactScrollPosition = 0;
+
 function startAutoScroll() {
   if (scrollInterval) clearInterval(scrollInterval);
   
+  // Target time: 50 seconds (50,000 milliseconds)
+  const targetDurationMs = 50000; 
+  const intervalMs = 20;
+  
+  // Sync the starting position
+  exactScrollPosition = window.pageYOffset || window.scrollY;
+  
   scrollInterval = setInterval(() => {
-    if (!autoScrolling || isHolding) return; 
+    if (!autoScrolling) return; 
     
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const currentScroll = window.pageYOffset || window.scrollY;
+    if (isHolding) {
+      // If user pauses, keep our tracker synced with their current position
+      exactScrollPosition = window.pageYOffset || window.scrollY;
+      return; 
+    }
     
-    if (currentScroll >= maxScroll - 10) {
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    
+    // Calculate how many pixels we MUST move per tick to finish in exactly 50 seconds
+    const pixelsPerTick = maxScroll / (targetDurationMs / intervalMs);
+    
+    // Move our exact position forward
+    exactScrollPosition += pixelsPerTick;
+    
+    if (exactScrollPosition >= maxScroll - 5) {
       clearInterval(scrollInterval);
       autoScrolling = false;
       return;
     }
     
-    // Increased scroll amount from 1 to 2 for a faster visual speed
-    window.scrollBy(0, 2);
-  // Decreased interval from 30ms to 20ms for faster update rate
-  }, 20); 
+    // Use scrollTo for precise decimal tracking (smoother than scrollBy)
+    window.scrollTo(0, exactScrollPosition);
+  }, intervalMs); 
 }
 
 function pauseScroll() { isHolding = true; }
