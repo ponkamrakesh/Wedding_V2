@@ -16,8 +16,6 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* REMOVED: html { scroll-behavior: smooth; } to fix the stuttering conflict! */
-
     body {
       background: var(--deep);
       color: var(--cream);
@@ -234,25 +232,6 @@
       color: rgba(253,246,227,0.7);
       animation: fadeUp 1s ease 1.2s both;
       margin-top: 16px;
-    }
-    .scroll-hint {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      color: rgba(212,168,67,0.5);
-      font-size: 11px;
-      letter-spacing: 3px;
-      animation: bounce 2s ease infinite;
-    }
-    .scroll-arrow { font-size: 20px; }
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(8px); }
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(30px); }
@@ -643,11 +622,6 @@
   </div>
   <div class="ornament-line"><span>❧</span></div>
   <div class="opening-date">Saturday · 9th May 2026 · Musunuru, Kavali</div>
-
-  <div class="scroll-hint">
-    <div class="scroll-arrow">↓</div>
-    <span>scroll</span>
-  </div>
 </section>
 
 <section id="families">
@@ -822,7 +796,6 @@ const sections = document.querySelectorAll('section');
 const dots = document.querySelectorAll('.dot');
 
 function scrollToSection(i) {
-  // Explicitly command smooth scrolling here since we removed it from CSS
   window.scrollTo({
     top: sections[i].offsetTop,
     behavior: 'smooth'
