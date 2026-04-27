@@ -874,6 +874,58 @@
 
   document.addEventListener('click', tryAutoplay);
   document.addEventListener('touchstart', tryAutoplay);
+  let currentSection = 0;
+let autoScrollInterval = null;
+let resumeTimeout;
+
+// Start auto scroll
+function startAutoScroll() {
+  stopAutoScroll();
+
+  autoScrollInterval = setInterval(() => {
+    currentSection++;
+
+    if (currentSection >= sections.length) {
+      currentSection = 0; // loop back to first
+    }
+
+    sections[currentSection].scrollIntoView({
+      behavior: 'smooth'
+    });
+  }, 5000); // 5 seconds per section
+}
+
+// Stop auto scroll
+function stopAutoScroll() {
+  if (autoScrollInterval) {
+    clearInterval(autoScrollInterval);
+  }
+}
+
+// Reset timer when user interacts
+function resetAutoScrollTimer() {
+  stopAutoScroll();
+  clearTimeout(resumeTimeout);
+
+  resumeTimeout = setTimeout(() => {
+    startAutoScroll();
+  }, 8000); // resume after 8 seconds
+}
+
+// Start after page load
+window.addEventListener('load', () => {
+  setTimeout(startAutoScroll, 2000);
+});
+
+// Stop / reset on user interaction
+['wheel', 'touchstart', 'click'].forEach(event => {
+  document.addEventListener(event, resetAutoScrollTimer);
+});
+
+// Optional: stop when music button clicked
+musicControl.addEventListener('click', () => {
+  stopAutoScroll();
+});
 </script>
 </body>
 </html>
