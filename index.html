@@ -49,7 +49,54 @@
       text-align: center;
       position: relative;
       z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    /* WELCOME IMAGES (BRIDE & GROOM) */
+    .welcome-images {
+      display: flex;
+      justify-content: center;
+      gap: clamp(15px, 5vw, 40px);
+      margin-bottom: 30px;
+    }
+    .welcome-img-wrapper {
+      width: clamp(110px, 30vw, 180px);
+      height: clamp(110px, 30vw, 180px);
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      padding: 6px;
+      background: rgba(13, 9, 5, 0.5);
+      box-shadow: 0 0 25px rgba(212,168,67,0.3);
+      opacity: 0; 
+      transform: scale(0.3);
+    }
+    .welcome-img-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .welcome-img-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Smooth Pop Up Animation */
+    .bride-img-wrapper {
+      animation: popUpSmooth 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+    }
+    .groom-img-wrapper {
+      animation: popUpSmooth 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+    }
+    
+    @keyframes popUpSmooth {
+      0% { opacity: 0; transform: scale(0.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
     .welcome-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(32px, 8vw, 50px);
@@ -57,7 +104,10 @@
       font-style: italic;
       margin-bottom: 30px;
       font-weight: 300;
+      opacity: 0;
+      animation: fadeIn 1s ease 1s forwards;
     }
+    
     #open-invite-btn {
       padding: 15px 35px;
       font-family: 'Cinzel', serif;
@@ -69,13 +119,18 @@
       border: 1px solid var(--gold);
       border-radius: 40px;
       cursor: pointer;
-      animation: pulseBtn 2s infinite;
       backdrop-filter: blur(5px);
       transition: all 0.3s;
+      opacity: 0;
+      animation: pulseBtn 2s infinite, fadeIn 1s ease 1.5s forwards;
     }
     #open-invite-btn:hover {
       background: rgba(212,168,67,0.2);
       color: var(--cream);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
     @keyframes pulseBtn {
       0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212,168,67, 0.4); }
@@ -564,6 +619,21 @@
 
 <div id="welcome-overlay">
   <div class="welcome-content">
+    
+    <div class="welcome-images">
+      <div class="welcome-img-wrapper bride-img-wrapper">
+        <div class="welcome-img-inner">
+          <img src="./IMG-20260428-WA0001.jpg" alt="Kavya">
+        </div>
+      </div>
+      
+      <div class="welcome-img-wrapper groom-img-wrapper">
+        <div class="welcome-img-inner">
+          <img src="./IMG-20260428-WA0000.jpg" alt="Naveen">
+        </div>
+      </div>
+    </div>
+
     <h2 class="welcome-title">Welcome to Our Wedding</h2>
     <button id="open-invite-btn">Tap to Open Invitation</button>
   </div>
@@ -762,7 +832,7 @@
 </section>
 
 <audio id="weddingAudio" preload="auto" style="display:none;">
-  <source src="/Wedding_BGM.mp3" type="audio/mpeg">
+  <source src="/Thaman_S_Radhe_Shyam_Climax_Bgm_Instrumental_Ringtone_(by Fringster.com).mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -914,10 +984,10 @@ function autoScrollStep(currentTime) {
 }
 
 function startAutoScroll() {
-  if (animationId) cancelAnimationFrame(animationId); // prevent overlapping animations
+  if (animationId) cancelAnimationFrame(animationId); 
   exactScrollPosition = window.pageYOffset || window.scrollY;
   lastTime = 0; 
-  autoScrolling = true; // Make sure it revives if it had previously reached the bottom
+  autoScrolling = true; 
   animationId = requestAnimationFrame(autoScrollStep);
 }
 
@@ -926,7 +996,7 @@ function resumeScroll() { isHolding = false; }
 
 // Handle the "Tap to Open" Button
 openBtn.addEventListener('click', () => {
-  hasStarted = true; // Let the page know the experience has begun
+  hasStarted = true; 
 
   audio.play().then(() => {
     setMusicState(true);
@@ -934,9 +1004,8 @@ openBtn.addEventListener('click', () => {
 
   welcomeOverlay.classList.add('fade-out');
 
-  // Start the auto-scroll
   if (autoScrolling) {
-    setTimeout(startAutoScroll, 500); // Slight delay to let the fade-out begin
+    setTimeout(startAutoScroll, 500); 
   }
 });
 
@@ -952,20 +1021,18 @@ window.addEventListener('mouseleave', resumeScroll);
 window.addEventListener('scroll', () => {
   const currentY = window.pageYOffset || window.scrollY;
   
-  // Flag that the user has scrolled past the top section
   if (hasStarted && currentY > 50) {
     leftTop = true;
   }
 
-  // If the user left the top and now returned all the way back to 0
   if (hasStarted && leftTop && currentY <= 0) {
-    leftTop = false; // Reset flag so it doesn't trigger repeatedly
+    leftTop = false; 
     
-    // 1. Restart Music
+    // Restart Music
     audio.currentTime = 0;
     audio.play().then(() => setMusicState(true)).catch(err => console.log(err));
     
-    // 2. Restart Auto-Scroll
+    // Restart Auto-Scroll
     startAutoScroll();
   }
 }, { passive: true });
