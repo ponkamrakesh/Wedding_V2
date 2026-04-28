@@ -761,8 +761,8 @@
   </div>
 </section>
 
-<audio id="weddingAudio" loop preload="auto" style="display:none;">
-  <source src="/Wedding_BGM.mp3" type="audio/mpeg">
+<audio id="weddingAudio" preload="auto" style="display:none;">
+  <source src="/Thaman_S_Radhe_Shyam_Climax_Bgm_Instrumental_Ringtone_(by Fringster.com).mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -866,11 +866,21 @@ musicControl.addEventListener('click', (e) => {
 audio.addEventListener('play', () => setMusicState(true));
 audio.addEventListener('pause', () => setMusicState(false));
 
+// Change the status when the music completely finishes playing
+audio.addEventListener('ended', () => {
+  setMusicState(false);
+  musicStatus.textContent = 'Ended';
+});
+
 let autoScrolling = true;
 let isHolding = false;
 let exactScrollPosition = 0;
 let lastTime = 0;
 let animationId;
+
+// Trackers to restart animation & music if they scroll back to the top
+let hasStarted = false;
+let leftTop = false;
 
 // Target time: 50 seconds (50,000 milliseconds)
 const targetDurationMs = 50000; 
@@ -904,8 +914,10 @@ function autoScrollStep(currentTime) {
 }
 
 function startAutoScroll() {
+  if (animationId) cancelAnimationFrame(animationId); // prevent overlapping animations
   exactScrollPosition = window.pageYOffset || window.scrollY;
   lastTime = 0; 
+  autoScrolling = true; // Make sure it revives if it had previously reached the bottom
   animationId = requestAnimationFrame(autoScrollStep);
 }
 
@@ -914,6 +926,8 @@ function resumeScroll() { isHolding = false; }
 
 // Handle the "Tap to Open" Button
 openBtn.addEventListener('click', () => {
+  hasStarted = true; // Let the page know the experience has begun
+
   audio.play().then(() => {
     setMusicState(true);
   }).catch(err => console.log("Audio play failed:", err));
@@ -933,6 +947,28 @@ window.addEventListener('touchcancel', resumeScroll, { passive: true });
 window.addEventListener('mousedown', pauseScroll);
 window.addEventListener('mouseup', resumeScroll);
 window.addEventListener('mouseleave', resumeScroll);
+
+// Scroll listener to track returning to the top
+window.addEventListener('scroll', () => {
+  const currentY = window.pageYOffset || window.scrollY;
+  
+  // Flag that the user has scrolled past the top section
+  if (hasStarted && currentY > 50) {
+    leftTop = true;
+  }
+
+  // If the user left the top and now returned all the way back to 0
+  if (hasStarted && leftTop && currentY <= 0) {
+    leftTop = false; // Reset flag so it doesn't trigger repeatedly
+    
+    // 1. Restart Music
+    audio.currentTime = 0;
+    audio.play().then(() => setMusicState(true)).catch(err => console.log(err));
+    
+    // 2. Restart Auto-Scroll
+    startAutoScroll();
+  }
+}, { passive: true });
 </script>
 </body>
 </html>
