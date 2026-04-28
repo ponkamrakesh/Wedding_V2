@@ -12,6 +12,9 @@
       --red: #8B1A1A;
       --cream: #fdf6e3;
       --deep: #0d0905;
+      
+      /* Perfected, reusable mathematical heart shape */
+      --heart-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='black' d='M100,180.5C40,120.5 15,85.5 15,55.5C15,25.5 40,5.5 70,5.5C88,5.5 100,18.5 100,18.5C100,18.5 112,5.5 130,5.5C160,5.5 185,25.5 185,55.5C185,85.5 160,120.5 100,180.5Z' /%3E%3C/svg%3E");
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,6 +25,60 @@
       font-family: 'Cormorant Garamond', serif;
       overflow-x: hidden;
     }
+
+    /* ===== FLYING PICTURE HEARTS (SIDES) ===== */
+    #flying-hearts-container {
+      position: fixed;
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      pointer-events: none; /* Allows user to click things behind them */
+      z-index: 50; /* Sits above background, below text/modals */
+      overflow: hidden;
+    }
+
+    .flying-heart-wrap {
+      position: absolute;
+      bottom: -150px;
+      width: clamp(45px, 10vw, 75px);
+      height: clamp(45px, 10vw, 75px);
+      background-color: var(--gold); /* Border color */
+      
+      -webkit-mask-image: var(--heart-shape);
+      mask-image: var(--heart-shape);
+      -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat;
+      mask-size: contain; mask-position: center; mask-repeat: no-repeat;
+      
+      opacity: 0;
+      animation: flyUp var(--duration) linear forwards;
+    }
+
+    .flying-heart-inner {
+      position: absolute;
+      top: 3px; left: 3px; right: 3px; bottom: 3px;
+      background: var(--deep);
+      
+      -webkit-mask-image: var(--heart-shape);
+      mask-image: var(--heart-shape);
+      -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat;
+      mask-size: contain; mask-position: center; mask-repeat: no-repeat;
+    }
+
+    .flying-heart-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+    }
+
+    @keyframes flyUp {
+      0% { transform: translateY(0) scale(0.5) rotate(var(--rot-start)); opacity: 0; }
+      15% { opacity: 0.6; } /* Fades in smoothly */
+      85% { opacity: 0.6; }
+      100% { transform: translateY(-120vh) scale(1) rotate(var(--rot-end)); opacity: 0; }
+    }
+
 
     /* ===== WELCOME OVERLAY ===== */
     #welcome-overlay {
@@ -54,65 +111,70 @@
       align-items: center;
     }
 
-    /* ===== BIG HEART SHAPED COUPLE IMAGE ===== */
+    /* ===== MAIN COUPLE HEART ===== */
     .welcome-images {
       margin-bottom: 25px;
     }
 
     .heart-container {
-      /* Adds a glowing drop shadow around the whole heart */
+      position: relative;
       filter: drop-shadow(0 0 35px rgba(212,168,67,0.4));
     }
 
-    /* Wrapper creates the large size and gold border */
+    /* Small decorative hearts around the main frame */
+    .dec-heart {
+      position: absolute;
+      font-size: 24px;
+      opacity: 0;
+      z-index: 15;
+      filter: drop-shadow(0 0 10px rgba(212,168,67,0.6));
+    }
+    /* Individual positions and pop-up timings */
+    .dh-1 { top: -5%; left: 15%; color: var(--gold); font-size: 35px; animation: popDec 1.2s cubic-bezier(0.34,1.56,0.64,1) 1.2s forwards; }
+    .dh-2 { top: 15%; right: -5%; color: var(--red); font-size: 45px; animation: popDec 1.2s cubic-bezier(0.34,1.56,0.64,1) 1.5s forwards; }
+    .dh-3 { bottom: 10%; left: -10%; color: var(--gold2); font-size: 25px; animation: popDec 1.2s cubic-bezier(0.34,1.56,0.64,1) 1.8s forwards; }
+    .dh-4 { bottom: -5%; right: 15%; color: var(--gold); font-size: 30px; animation: popDec 1.2s cubic-bezier(0.34,1.56,0.64,1) 2.1s forwards; }
+
+    @keyframes popDec {
+      0% { opacity: 0; transform: scale(0) rotate(-30deg); }
+      100% { opacity: 0.8; transform: scale(1) rotate(15deg); }
+    }
+
     .heart-wrapper {
       position: relative;
-      width: clamp(260px, 70vw, 420px); /* Much larger dynamic size */
-      height: clamp(260px, 70vw, 420px); /* Perfect square ensures heart doesn't warp */
+      width: clamp(260px, 70vw, 420px); 
+      height: clamp(260px, 70vw, 420px); 
       background-color: var(--gold);
       
-      /* Perfect, scalable SVG mask instead of rigid clip-path */
-      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='black' d='M100,185 C100,185 15,120 15,60 C15,20 60,15 100,55 C140,15 185,20 185,60 C185,120 100,185 100,185 Z' /%3E%3C/svg%3E");
-      -webkit-mask-size: contain;
-      -webkit-mask-position: center;
-      -webkit-mask-repeat: no-repeat;
-      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='black' d='M100,185 C100,185 15,120 15,60 C15,20 60,15 100,55 C140,15 185,20 185,60 C185,120 100,185 100,185 Z' /%3E%3C/svg%3E");
-      mask-size: contain;
-      mask-position: center;
-      mask-repeat: no-repeat;
+      -webkit-mask-image: var(--heart-shape);
+      mask-image: var(--heart-shape);
+      -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat;
+      mask-size: contain; mask-position: center; mask-repeat: no-repeat;
 
       transform: scale(0.3);
       opacity: 0;
       animation: heartPopIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+      z-index: 20;
     }
 
-    /* Inner container cuts the picture exactly 6px smaller to reveal the gold background as a border */
     .heart-image-container {
       position: absolute;
-      top: 6px;
-      left: 6px;
-      right: 6px;
-      bottom: 6px;
+      top: 6px; left: 6px; right: 6px; bottom: 6px;
       background: var(--deep);
 
-      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='black' d='M100,185 C100,185 15,120 15,60 C15,20 60,15 100,55 C140,15 185,20 185,60 C185,120 100,185 100,185 Z' /%3E%3C/svg%3E");
-      -webkit-mask-size: contain;
-      -webkit-mask-position: center;
-      -webkit-mask-repeat: no-repeat;
-      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='black' d='M100,185 C100,185 15,120 15,60 C15,20 60,15 100,55 C140,15 185,20 185,60 C185,120 100,185 100,185 Z' /%3E%3C/svg%3E");
-      mask-size: contain;
-      mask-position: center;
-      mask-repeat: no-repeat;
+      -webkit-mask-image: var(--heart-shape);
+      mask-image: var(--heart-shape);
+      -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat;
+      mask-size: contain; mask-position: center; mask-repeat: no-repeat;
     }
 
     .heart-image-container img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 25%; /* Keeps faces framed nicely below the top dip of the heart */
+      object-position: center 25%;
     }
     
-    /* Smooth Heart Pop-In Animation */
     @keyframes heartPopIn {
       0% { opacity: 0; transform: scale(0.3); }
       100% { opacity: 1; transform: scale(1); }
@@ -638,14 +700,21 @@
 </head>
 <body>
 
+<div id="flying-hearts-container"></div>
+
 <div id="welcome-overlay">
   <div class="welcome-content">
     
     <div class="welcome-images">
       <div class="heart-container">
+        <div class="dec-heart dh-1">♥</div>
+        <div class="dec-heart dh-2">♥</div>
+        <div class="dec-heart dh-3">♥</div>
+        <div class="dec-heart dh-4">♥</div>
+
         <div class="heart-wrapper">
           <div class="heart-image-container">
-            <img src="./IMG-20260428-WA0001.jpg" alt="Naveen & Kavya">
+            <img src="./couple-pic.jpg" alt="Naveen & Kavya">
           </div>
         </div>
       </div>
@@ -1011,6 +1080,52 @@ function startAutoScroll() {
 function pauseScroll() { isHolding = true; }
 function resumeScroll() { isHolding = false; }
 
+
+/* ===== FLYING PICTURE HEARTS LOGIC ===== */
+function spawnFlyingHeart() {
+  if (!hasStarted) return; // Only spawn if they opened the invitation
+
+  const container = document.getElementById('flying-hearts-container');
+  const heartWrap = document.createElement('div');
+  heartWrap.className = 'flying-heart-wrap';
+
+  // Randomize Side (Left or Right)
+  const isLeft = Math.random() > 0.5;
+  const sidePosition = Math.random() * 10 + 2; // Keep them between 2% and 12% from the edge
+
+  if (isLeft) {
+    heartWrap.style.left = sidePosition + '%';
+  } else {
+    heartWrap.style.right = sidePosition + '%';
+  }
+
+  // Randomize floating speed (12s to 20s) and gentle rotations
+  const duration = Math.random() * 8 + 12;
+  const rotStart = (Math.random() * 30 - 15) + 'deg';
+  const rotEnd = (Math.random() * 60 - 30) + 'deg';
+
+  heartWrap.style.setProperty('--duration', duration + 's');
+  heartWrap.style.setProperty('--rot-start', rotStart);
+  heartWrap.style.setProperty('--rot-end', rotEnd);
+
+  // Setup the inner picture mask
+  const inner = document.createElement('div');
+  inner.className = 'flying-heart-inner';
+  const img = document.createElement('img');
+  
+  // NOTE: MAKE SURE THIS MATCHES YOUR IMAGE PATH
+  img.src = './couple-pic.jpg'; 
+  
+  inner.appendChild(img);
+  heartWrap.appendChild(inner);
+  container.appendChild(heartWrap);
+
+  // Clean up the heart from memory once it floats off the screen
+  setTimeout(() => {
+    heartWrap.remove();
+  }, duration * 1000);
+}
+
 // Handle the "Tap to Open" Button
 openBtn.addEventListener('click', () => {
   hasStarted = true; 
@@ -1021,8 +1136,12 @@ openBtn.addEventListener('click', () => {
 
   welcomeOverlay.classList.add('fade-out');
 
+  // Start the auto-scroll and start generating flying hearts!
   if (autoScrolling) {
-    setTimeout(startAutoScroll, 500); 
+    setTimeout(() => {
+      startAutoScroll();
+      setInterval(spawnFlyingHeart, 2500); // Generate a new flying picture heart every 2.5 seconds
+    }, 500); 
   }
 });
 
