@@ -288,10 +288,6 @@
     .countdown-num { font-family: 'Cinzel', serif; font-size: 36px; color: var(--gold); line-height: 1; display: block; }
     .countdown-label { font-size: 10px; letter-spacing: 2px; color: rgba(212,168,67,0.5); text-transform: uppercase; margin-top: 4px; }
     .countdown-sep { font-size: 36px; color: rgba(212,168,67,0.3); line-height: 1; padding-top: 2px; }
-    
-    .nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 100; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(212,168,67,0.3); cursor: pointer; transition: all 0.3s; border: 1px solid rgba(212,168,67,0.5); }
-    .dot.active { background: var(--gold); transform: scale(1.3); }
   </style>
 </head>
 <body>
@@ -319,14 +315,6 @@
     <button id="open-invite-btn">Tap to Open Invitation</button>
   </div>
 </div>
-
-<nav class="nav-dots">
-  <div class="dot active" onclick="scrollToSection(0)"></div>
-  <div class="dot" onclick="scrollToSection(1)"></div>
-  <div class="dot" onclick="scrollToSection(2)"></div>
-  <div class="dot" onclick="scrollToSection(3)"></div>
-  <div class="dot" onclick="scrollToSection(4)"></div>
-</nav>
 
 <div id="musicControl" class="music-toggle">
   <span class="music-icon">🎵</span>
@@ -471,21 +459,6 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.15 });
 revealElements.forEach(el => observer.observe(el));
-
-/* ===== NAV DOTS ===== */
-const sections = document.querySelectorAll('section');
-const dots = document.querySelectorAll('.dot');
-function scrollToSection(i) { window.scrollTo({ top: sections[i].offsetTop, behavior: 'smooth' }); }
-const sectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const idx = Array.from(sections).indexOf(e.target);
-      dots.forEach(d => d.classList.remove('active'));
-      dots[idx].classList.add('active');
-    }
-  });
-}, { threshold: 0.5 });
-sections.forEach(s => sectionObserver.observe(s));
 
 /* ===== COUNTDOWN ===== */
 function updateCountdown() {
