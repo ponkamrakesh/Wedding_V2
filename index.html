@@ -162,8 +162,18 @@
     }
 
     .heart-image-container img {
-      width: 100%; height: 100%;
+      width: 100%; 
+      height: 100%;
       object-fit: cover;
+    }
+
+    /* Naveen's heart - optimized to show head to hip */
+    .heart-container:nth-child(1) .heart-image-container img {
+      object-position: center 15%; /* Shows face and upper body till hip */
+    }
+
+    /* Kavya's heart - kept as original */
+    .heart-container:nth-child(2) .heart-image-container img {
       object-position: center 20%; 
     }
     
